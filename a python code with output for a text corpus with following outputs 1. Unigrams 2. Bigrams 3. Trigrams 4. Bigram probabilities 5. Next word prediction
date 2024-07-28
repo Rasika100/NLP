@@ -1,0 +1,51 @@
+import nltk
+from nltk.util import ngrams
+from nltk import FreqDist
+from nltk.tokenize import word_tokenize
+from nltk.probability import ConditionalFreqDist
+import random
+
+# Sample text corpus
+text = """Natural language processing (NLP) is a field of artificial intelligence that focuses on the interaction between computers and humans through natural language. The ultimate objective of NLP is to enable computers to understand, interpret, and generate human language in a way that is both valuable and meaningful."""
+
+# Tokenize the text
+tokens = word_tokenize(text.lower())
+
+# Unigrams
+unigrams = list(ngrams(tokens, 1))
+unigram_freq = FreqDist(unigrams)
+
+# Bigrams
+bigrams = list(ngrams(tokens, 2))
+bigram_freq = FreqDist(bigrams)
+
+# Trigrams
+trigrams = list(ngrams(tokens, 3))
+trigram_freq = FreqDist(trigrams)
+
+# Bigram Probabilities
+cfd = ConditionalFreqDist(bigrams)
+bigram_probabilities = {bigram: cfd[bigram[0]].freq(bigram[1]) for bigram in bigrams}
+
+# Next word prediction function
+def predict_next_word(word):
+    if word in cfd:
+        next_word = cfd[word].max()
+        return next_word
+    else:
+        return "No prediction available"
+
+# Outputs
+print("Unigrams:")
+print(unigram_freq.most_common(10))
+print("\nBigrams:")
+print(bigram_freq.most_common(10))
+print("\nTrigrams:")
+print(trigram_freq.most_common(10))
+print("\nBigram Probabilities:")
+for bigram, prob in bigram_probabilities.items():
+    print(f"{bigram}: {prob:.4f}")
+
+print("\nNext word prediction:")
+test_word = 'the'
+print(f"Next word after '{test_word}': {predict_next_word(test_word)}")
